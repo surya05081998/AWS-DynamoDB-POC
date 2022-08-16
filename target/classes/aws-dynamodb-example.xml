@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:dynamodb="http://www.mulesoft.org/schema/mule/dynamodb"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/dynamodb http://www.mulesoft.org/schema/mule/dynamodb/current/mule-dynamodb.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b51461b4-fa03-481f-a4a5-c24fed7564a7" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<dynamodb:config name="Amazon_DynamoDB_Configuration" doc:name="Amazon DynamoDB Configuration" doc:id="7f874a90-8816-4248-92fc-718c8747574d" >
+		<dynamodb:basic-connection accessKey="AKIAUOYQED2UW7N7TVGS" secretKey="K0Xw+wihFmfClGpFpnHffy+RmO7+R0+4LApIjWXA" />
+	</dynamodb:config>
+	<flow name="aws-dynamodb-exampleFlow" doc:id="58a13d1e-32d7-438e-a90b-35ce386bae46" >
+		<http:listener doc:name="Listener" doc:id="fe1877c4-2461-40a2-bf32-10ce80ecbf58" config-ref="HTTP_Listener_config" path="/select"/>
+		<dynamodb:scan tableName="mulesoftDB" doc:name="Scan" doc:id="41560ca8-64a1-4045-aec6-11c948baa9fe" config-ref="Amazon_DynamoDB_Configuration" select="ALL_ATTRIBUTES"/>
+		<ee:transform doc:name="Transform Message" doc:id="8a86faa6-7be4-4bc1-a846-3adb812c9050" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="aws-dynamodb-exampleFlow1" doc:id="abc9ec95-9fda-4812-bf8d-6dbffe57c161" >
+		<http:listener doc:name="Listener" doc:id="04ce5204-288e-4da5-bd65-a70ba2d6271b" config-ref="HTTP_Listener_config" path="/describeTable"/>
+		<dynamodb:describe-table tableName="mulesoftDB" doc:name="Describe table" doc:id="36126ce8-472a-458c-b9b5-14525984d6f3" config-ref="Amazon_DynamoDB_Configuration"/>
+		<ee:transform doc:name="Transform Message" doc:id="9d325b0d-ced9-49b8-a31e-f754872379a6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
